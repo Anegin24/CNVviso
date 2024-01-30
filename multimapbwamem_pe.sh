@@ -4,18 +4,18 @@
 
 ref=~/Bioinformatics/Ref/hg38chr.fa
 
-forwardread=(~/Bioinformatics/veriseqdata/fastq/*_R1*)
+forwardread=(~/Bioinformatics/Test31/fastq/*_R1*)
 for forwardread in ${forwardread[@]}
 do
-#reverseread=$(echo $forwardread | sed 's\R1\R2\g')
+reverseread=$(echo $forwardread | sed 's\R1\R2\g')
 
 outputfilename=$(basename $forwardread | cut -f1 -d_)
 
-bwa mem $ref $forwardread > ~/Bioinformatics/veriseqdata/sam/${outputfilename}.sam
+bwa mem $ref $forwardread $reverseread > ~/Bioinformatics/Test31/sampe/${outputfilename}.sam
 
-cd ~/Bioinformatics/veriseqdata/processbam
+cd ~/Bioinformatics/Test31/processbampe
 
-samtools view -b -o ${outputfilename}.bam ~/Bioinformatics/veriseqdata/sam/${outputfilename}.sam
+samtools view -b -o ${outputfilename}.bam ~/Bioinformatics/Test31/sampe/${outputfilename}.sam
 
 samtools view -b -F 0xc ${outputfilename}.bam -o ${outputfilename}.filtered.bam
 
@@ -25,6 +25,6 @@ samtools fixmate -m ${outputfilename}.sorted.n.bam ${outputfilename}.fixmate.bam
 
 samtools sort -@ 20 ${outputfilename}.fixmate.bam -o ${outputfilename}.sorted.p.bam
 
-samtools markdup -r -@ 20 ${outputfilename}.sorted.p.bam ~/Bioinformatics/veriseqdata/finalbam/${outputfilename}.dedup.bam
+samtools markdup -r -@ 20 ${outputfilename}.sorted.p.bam ~/Bioinformatics/Test31/finalbampe/${outputfilename}.dedup.bam
 
 done
