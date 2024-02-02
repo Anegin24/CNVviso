@@ -6,19 +6,22 @@ library(DT)
 library(ggtext)
 library(tidyverse)
 library(plotly)
+library(smoother)
 # UI
 ui <- fluidPage(
-  titlePanel("Import Data"),
+  titlePanel("CNVviso: A tool for visualize CNV data from low-coverage WGS"),
   sidebarLayout(
-    sidebarPanel(
-      fileInput("file_dfcnr", "Choose .cnr file", accept = c(".txt")),
-      fileInput("file_dfcns", "Choose .cns file", accept = c(".txt")),
+    sidebarPanel(width=2,
+      fileInput("file_dfcnr", "Choose LLR file(.cnr)", accept = c(".cnr")),
+      fileInput("file_dfcns", "Choose Seqmentation file(.cns)", accept = c(".cns")),
+      fileInput("file_dfcall", "Choose CNVcall file(.call.cns)", accept = c(".call.cns")),
       checkboxInput("displayTable", "Display Data", value = FALSE),
-      downloadButton("downloadData", "Download Data")
+      downloadButton("downloadData", "Download Data"),
+      sliderInput("xSlider", "Chromosome size", min = 0, max = 66, value = c(0, 66))
     ),
-    mainPanel(
+    mainPanel(width=10,
       plotOutput("myPlot", width = "100%", height = "400px"),
-      DTOutput("dataTable")
+      DTOutput("dataTable",width= "50%")
     )
   ),
   fluidRow(
@@ -64,16 +67,22 @@ server <- function(input, output) {
     read.table(input$file_dfcns$datapath, header = TRUE)
   })
   
+  dfcall_data <- reactive({
+    req(input$file_dfcall)
+    read.table(input$file_dfcall$datapath, header = TRUE)
+  })
+  
   observe({
-    req(dfcnr_data(), dfcns_data())
+    req(dfcnr_data(), dfcns_data(),dfcall_data())
     
     # Check if data is being loaded correctly
     print(dfcnr_data())
     print(dfcns_data())
+    print(dfcall_data())
     
     dfcnr <- dfcnr_data()
     dfcns <- dfcns_data()
-    
+    dfcall <- dfcall_data()
     # Data processing
     dfcnr <- dfcnr %>%
       mutate(lrr = 2 * 2 ^ log2)
@@ -83,7 +92,12 @@ server <- function(input, output) {
     
     dfcns <- dfcns %>%
       mutate(cncall = 2 * 2 ^ log2) %>%
-      select(chromosome, start, end, cncall)
+      select(chromosome, start, end, cncall) %>%
+      filter(chromosome != "chrY")
+    dfcall <- dfcall %>% filter(chromosome == "chrY") %>% 
+      select(chromosome,start,end,cn)
+      names(dfcall)[names(dfcall) == "cn"] <- "cncall"
+    dfcns<-merge(dfcall,dfcns,all=TRUE)
     df <- merge(dfcnr, dfcns, by = c("chromosome", "end"), all = TRUE) %>%
       select(-start.y)
       names(df)[names(df) == "start.x"] <- "start"
@@ -91,11 +105,11 @@ server <- function(input, output) {
                 by.y = c("chromosome", "start"), all = TRUE) %>%
       select(-end.y)
       names(df)[names(df) == "end.x"] <- "end"
-    
     df[is.na(df)] <- 0
     df$cncall <- df$cncall.x + df$cncall.y
     df <- df %>% arrange(order)
     df <- df %>% select(chromosome, start, end, lrr, cncall)
+    df <- df %>% mutate(lrr=ifelse(chromosome=="chrY",dfcall$cncall,lrr))
     
     CNvector <- dfcns$cncall
     CNcall <- as.numeric(df$cncall)
@@ -148,8 +162,11 @@ server <- function(input, output) {
       mutate(lrr = ifelse(lrr > cncall + 0.1, NA, lrr)) %>% na.omit()
     data <- data %>%
       mutate(lrr = ifelse(lrr < cncall - 0.1, NA, lrr)) %>% na.omit()
+    cncallcount<-table(data$cncall)
+    singletons<-names(cncallcount[cncallcount==1])
+    data<-data[!data$cncall %in% singletons, ]
     data <- data %>%
-      group_by(chromosome) %>%
+      group_by(chromosome,cncall) %>%
       mutate(lrr = smth.gaussian(lrr)) %>% na.omit()
     
     table<-data%>%select(chromosome,lrr)
@@ -184,11 +201,13 @@ server <- function(input, output) {
                            guide = guide_axis(angle = 45)) +
         labs(x = "Chromosomes", y = "Copy Number") +
         theme(
-          axis.text = element_text(size=12),
+          axis.text.x = element_markdown(size=12),
+          axis.text.y = element_markdown(size=12),
           plot.background = element_rect(fill = "#F3FAFE"),
           panel.background = element_blank()
         ) +
-        theme_bw()
+        theme_bw()+
+        coord_cartesian(xlim = c(input$xSlider[1], input$xSlider[2]))
     })
     output$myPlot1 <- renderPlot({
       data%>%filter(chromosome == "chr1")%>%
@@ -744,6 +763,18 @@ server <- function(input, output) {
     })
     output$dataTable <- renderDT({
       table
+    })
+    
+    observe({
+      if (input$displayTable %% 2 == 1) {
+        output$dataTable <- renderDT({
+          table
+        })
+      } else {
+        output$dataTable <- renderDT({
+          NULL
+        })
+      }
     })
   }) # Close the observe function here
   
