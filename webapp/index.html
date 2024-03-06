@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BWA-MEM Pipeline</title>
+</head>
+<body>
+    <h1>BWA-MEM Pipeline</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <label for="directory">Choose Directory:</label><br>
+        <input type="file" id="directory" name="directory"><br>
+        <input type="submit" value="Execute Script">
+    </form>
+    {% if output %}
+        <h2>Terminal Output:</h2>
+        <pre>{{ output }}</pre>
+    {% endif %}
+</body>
+</html>
+
