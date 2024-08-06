@@ -11,3 +11,27 @@ git clone https://github.com/Anegin24/CNVviso.git
 
           CNVviso.R
           CNVdat.R
+#### R packages dependencies
+          library(ggplot2)
+          library(DT)
+          library(ggtext)
+          library(tidyverse)
+          library(dplyr)
+          library(plotly)
+          library(smoother)
+          library(shiny)
+          library(magick)
+          library(patchwork)
+          library(RSQLite)
+          library(purrr)
+          library(here)
+#### Tutorial
+          1. Compress cnvkit result file to .zip
+          2. Run CNVviso.R
+          3. Import zip files
+          4. Click to file name and watch result
+          5. Save to database
+          6. You can watch imported sample without input again .zip file using CNVdat.R.
+          
+          
+          
