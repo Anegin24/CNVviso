@@ -7,3 +7,7 @@ cd /home/
 
 git clone https://github.com/Anegin24/CNVviso.git
 
+#### Shiny-server script
+
+          CNVviso.R
+          CNVdat.R
