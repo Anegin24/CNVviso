@@ -1,2 +1,3 @@
 # CNVviso
-Pipeline for visualization CNV from WGS low-coverage data using cnvkit
+ShinyR tool for visualization CNV from WGS ultra-low coverage data using cnvkit
+![Image Alt](https://github.com/Anegin24/CNVviso/blob/4eb49cf8bfb98f97899488b7dded1e1a0a96750d/CNVviso.png)
