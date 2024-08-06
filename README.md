@@ -3,7 +3,7 @@
 #### Installation
 You can download this git file to test it. Note: keep the folder structure intact to avoid path errors.
 
-cd /home/
+cd /home/user
 
 git clone https://github.com/Anegin24/CNVviso.git
 
