@@ -282,10 +282,10 @@ server <- function(input, output, session) {
     }
   })
   cyto <- reactive({
-    read_tsv("https://raw.githubusercontent.com/Anegin24/Microbiome-analysis/main/cytoBand.txt")
+    read_tsv("https://raw.githubusercontent.com/Anegin24/CNVviso/main/Shiny-server/cytoBand.txt")
   })
   annotation<-reactive({
-    read_tsv("https://raw.githubusercontent.com/Anegin24/Microbiome-analysis/main/annotation.tsv")
+    read_tsv("https://raw.githubusercontent.com/Anegin24/CNVviso/main/Shiny-server/annotation.tsv")
   })
   data <- reactive({
     req(dfcnr(),dfcns(),dfcall())
