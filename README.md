@@ -32,6 +32,8 @@ git clone https://github.com/Anegin24/CNVviso.git
           4. Click to file name and watch result
           5. Save to database
           6. You can watch imported sample without input again .zip file using CNVdat.R.
+#### Citation:
+An Nguyen Huu*, Nhung Trinh Thi Hong, Huong Bui Bich, Tien Vuong Quang, Dung Tien Pham and Hoi Le Thi. CNVviso: Visualisation Solution for Copy Number Variation Data from Ultra-Low Coverage Whole-Genome Sequencing in Preimplantation Genetic Testing. _Current Bioinformatics_. DOI: 10.2174/0115748936340523241113051828
           
           
           
